@@ -1,0 +1,12 @@
+name: ewapotranspiracja
+title: ewapotranspiracja
+username:
+account: openmeteo
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 266064
+bundleId: 1198558
+url: https://openmeteo.shinyapps.io/ewapotranspiracja/
+when: 1517274204.79853
+asMultiple: FALSE
+asStatic: FALSE
