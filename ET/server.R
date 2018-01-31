@@ -1,6 +1,7 @@
 library(shiny)
 library(readxl)
 library(water)
+library(dplyr)
 
 server <- function(input, output) {
   
@@ -39,6 +40,8 @@ server <- function(input, output) {
     dane$lon <- lon1
     dane$lat <- lat1
     dane$date2 <- as.Date(dane$date, format="%y-%m-%d")
+    dane$miesiac <- format(dane$date2, format="%Y-%m")
+    
     hh <- as.numeric(unlist(lapply(strsplit(as.character(dane$time), split = ":"), function(x) x[1])))
     minuty <- as.numeric(unlist(lapply(strsplit(as.character(dane$time), split = ":"), function(x) x[2])))
     
@@ -82,9 +85,12 @@ server <- function(input, output) {
   
   
   output$contents <- renderTable(
-    
-    head(getData())
-    
+    if (is.null(input$file1)) {
+      return(NULL)
+    }else{
+     getData() %>% dplyr::select(., date:pulsacja, prec, ET0_chwilowe:ET0_wys_na_godz) %>% head()
+    }
+  
   )
   
   
@@ -108,14 +114,38 @@ server <- function(input, output) {
     if (is.null(input$file1)) {
       return(NULL)
     }else{
-    plot(getData()[, c("date2","ET0_chwilowe")], type='h', col='blue', xlab='')
+    plot(getData()[, c("date2","ET0_na_godz")], type='h', col='blue', xlab='', lwd=2, main='ewapotranspiracja potencjalna')
     }
+  )
+    
+    output$plot4 <- renderPlot(
+      if (is.null(input$file1)) {
+        return(NULL)
+      }else{
+        plot(getData()[, c("date2","prec")], type='h', col='red', xlab='', main='opady', lwd=2)
+      }
+    )
+    
+    
+    output$tabelka <- renderTable(
+      if (is.null(input$file1)) {
+        return(NULL)
+      }else{
+        df <- getData()
+        wynik <- df %>% dplyr::group_by(miesiac) %>% dplyr::summarise(ewapotranspiracja=sum(ET0_na_godz, na.rm=T), 
+                                                       opad=sum(prec, na.rm = T)) %>%
+          mutate(bilans=opad-ewapotranspiracja) %>% as.data.frame()
+        return(wynik)
+      }
+    )
+    
+    
     
     #df <- getData()
     #tail(df)
     #plot(df$ET0_chwilowe)
     #plot(dane$ET0_wys_na_godz)
-  )
+  #)
   
     
 }
