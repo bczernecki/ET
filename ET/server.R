@@ -74,8 +74,8 @@ server <- function(input, output) {
     
     inFile <- input$file1
     if (is.null(input$file1)) {
-      c("W tym miejscu pojawi się kontrolnie pierwsze 6-rzędów przetworzonych danych oraz wykres słupkowy...")
-    }else{
+      c("Obliczenia pojawią się po wgraniu pliku" ) 
+      }else{
       return(NULL)
     }
   })
@@ -104,7 +104,7 @@ server <- function(input, output) {
                          temperatura=mean(t2m, na.rm = T),
                          wiatr=mean(ws, na.rm=T)) %>%
         mutate(bilans_parowania=opad-ewapotranspiracja) %>% 
-        dplyr::select(ewapotranspiracja, opad, bilans_parowania, temperatura, wiatr) %>% as.data.frame()
+        dplyr::select(miesiac, ewapotranspiracja, opad, bilans_parowania, temperatura, wiatr) %>% as.data.frame()
       return(wynik)
     }
   )
