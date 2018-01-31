@@ -22,11 +22,12 @@ ui <- fluidPage(
       mainPanel(
         #verbatimTextOutput("ncount_2"),
         textOutput("text"),
-        tableOutput('contents'),
+        #tableOutput('contents'),
+        tableOutput('tabelka'),
         verbatimTextOutput("plot2"),
         plotOutput('plot3'),
-        plotOutput('plot4'),
-        tableOutput('tabelka')
+        plotOutput('plot4')
+        
       )
       
     )

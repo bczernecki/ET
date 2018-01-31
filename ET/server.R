@@ -84,13 +84,29 @@ server <- function(input, output) {
   
   
   
-  output$contents <- renderTable(
+  # output$contents <- renderTable(
+  #   if (is.null(input$file1)) {
+  #     return(NULL)
+  #   }else{
+  #    getData() %>% dplyr::select(., date:pulsacja, prec, ET0_chwilowe:ET0_wys_na_godz) %>% head()
+  #   }
+  # 
+  # )
+  
+  output$tabelka <- renderTable(
     if (is.null(input$file1)) {
       return(NULL)
     }else{
-     getData() %>% dplyr::select(., date:pulsacja, prec, ET0_chwilowe:ET0_wys_na_godz) %>% head()
+      df <- getData()
+      wynik <- df %>% dplyr::group_by(miesiac) %>% 
+        dplyr::summarise(ewapotranspiracja=sum(ET0_na_godz, na.rm=T), 
+                         opad=sum(prec, na.rm = T),
+                         temperatura=mean(t2m, na.rm = T),
+                         wiatr=mean(ws, na.rm=T)) %>%
+        mutate(bilans_parowania=opad-ewapotranspiracja) %>% 
+        dplyr::select(ewapotranspiracja, opad, bilans_parowania, temperatura, wiatr) %>% as.data.frame()
+      return(wynik)
     }
-  
   )
   
   
@@ -127,17 +143,7 @@ server <- function(input, output) {
     )
     
     
-    output$tabelka <- renderTable(
-      if (is.null(input$file1)) {
-        return(NULL)
-      }else{
-        df <- getData()
-        wynik <- df %>% dplyr::group_by(miesiac) %>% dplyr::summarise(ewapotranspiracja=sum(ET0_na_godz, na.rm=T), 
-                                                       opad=sum(prec, na.rm = T)) %>%
-          mutate(bilans=opad-ewapotranspiracja) %>% as.data.frame()
-        return(wynik)
-      }
-    )
+
     
     
     
