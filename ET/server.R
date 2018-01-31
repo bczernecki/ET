@@ -6,6 +6,7 @@ server <- function(input, output) {
   
   
   
+  
   getData <- reactive({
     
     inFile <- input$file1
@@ -33,9 +34,15 @@ server <- function(input, output) {
       lon1 <- 16.94
       lat1 <- 52.46
     } 
-    
+
+    dane$alt <- alt
+    dane$lon <- lon1
+    dane$lat <- lat1
+    dane$date2 <- as.Date(dane$date, format="%y-%m-%d")
     hh <- as.numeric(unlist(lapply(strsplit(as.character(dane$time), split = ":"), function(x) x[1])))
     minuty <- as.numeric(unlist(lapply(strsplit(as.character(dane$time), split = ":"), function(x) x[2])))
+    
+    dane$date2 <- as.POSIXct(paste0(dane$date2, dane$time), format="%Y-%m-%d %H:%M")
     
     doy <- as.numeric(strftime(as.Date(dane$date, format="%y-%m-%d"), format="%j"))
     
@@ -53,9 +60,25 @@ server <- function(input, output) {
     dane$ET0_wys_na_godz[which(minuty!=0)] <- NA
     
     
+    
+    
     return(dane)
     
   })
+  
+ 
+  napis <- reactive({
+    
+    inFile <- input$file1
+    if (is.null(input$file1)) {
+      c("W tym miejscu pojawi się kontrolnie pierwsze 6-rzędów przetworzonych danych oraz wykres słupkowy...")
+    }else{
+      return(NULL)
+    }
+  })
+  
+  output$text <- renderText(napis())
+  
   
   
   output$contents <- renderTable(
@@ -74,10 +97,25 @@ server <- function(input, output) {
     })
   
   
-  output$plot2 <- renderPlot(
-    plot(getData()$ET0_wys_na_godz)
+  
+  
+  output$plot2 <- renderText(
+    print(str(getData()))
     #plot(dane$ET0_wys_na_godz)
     )
+  
+  output$plot3 <- renderPlot(
+    if (is.null(input$file1)) {
+      return(NULL)
+    }else{
+    plot(getData()[, c("date2","ET0_chwilowe")], type='h', col='blue', xlab='')
+    }
+    
+    #df <- getData()
+    #tail(df)
+    #plot(df$ET0_chwilowe)
+    #plot(dane$ET0_wys_na_godz)
+  )
   
     
 }
