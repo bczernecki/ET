@@ -41,6 +41,7 @@ server <- function(input, output) {
     dane$lat <- lat1
     dane$date2 <- as.Date(dane$date, format="%y-%m-%d")
     dane$miesiac <- format(dane$date2, format="%Y-%m")
+    dane$rok <- format(dane$date2, format="%Y")
     
     hh <- as.numeric(unlist(lapply(strsplit(as.character(dane$time), split = ":"), function(x) x[1])))
     minuty <- as.numeric(unlist(lapply(strsplit(as.character(dane$time), split = ":"), function(x) x[2])))
@@ -108,6 +109,26 @@ server <- function(input, output) {
       return(wynik)
     }
   )
+  
+  
+  output$tabelka_rok <- renderTable(
+    if (is.null(input$file1)) {
+      return(NULL)
+    }else{
+      df <- getData()
+      df$rok
+      wynik <- df %>% 
+        dplyr::summarise(ewapotranspiracja=sum(ET0_na_godz, na.rm=T), 
+                         opad=sum(prec, na.rm = T),
+                         temperatura=mean(t2m, na.rm = T),
+                         wiatr=mean(ws, na.rm=T)) %>%
+        mutate(bilans_parowania=opad-ewapotranspiracja,
+               rok=paste(min(df$rok),max(df$rok), sep="-")) %>% 
+        dplyr::select(rok, ewapotranspiracja, opad, bilans_parowania, temperatura, wiatr) %>% as.data.frame()
+      return(wynik)
+    }
+  )
+  
   
   
   output$downloadData <- downloadHandler(

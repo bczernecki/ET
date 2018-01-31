@@ -5,6 +5,6 @@ account: openmeteo
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 266064
-bundleId: 1201775
+bundleId: 1201801
 url: https://openmeteo.shinyapps.io/ewapotranspiracja/
-when: 1517434625.71005
+when: 1517435256.13655

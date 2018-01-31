@@ -24,6 +24,7 @@ ui <- fluidPage(
         textOutput("text"),
         #tableOutput('contents'),
         tableOutput('tabelka'),
+        tableOutput('tabelka_rok'),
         verbatimTextOutput("plot2"),
         plotOutput('plot3'),
         plotOutput('plot4')
