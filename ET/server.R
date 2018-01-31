@@ -63,6 +63,7 @@ server <- function(input, output) {
     dane$ET0_na_godz[which(minuty!=0)] <- NA
     dane$ET0_wys_na_godz[which(minuty!=0)] <- NA
     
+    dane$prec <- ifelse(dane$prec==0.0, NA, dane$prec)
     
     
     
@@ -104,7 +105,8 @@ server <- function(input, output) {
                          opad=sum(prec, na.rm = T),
                          temperatura=mean(t2m, na.rm = T),
                          wiatr=mean(ws, na.rm=T)) %>%
-        mutate(bilans_parowania=opad-ewapotranspiracja) %>% 
+        mutate(bilans_parowania=opad-ewapotranspiracja,
+               liczba_dni_z_opadem=sum(ifelse(opad>0,1,0))) %>% 
         dplyr::select(miesiac, ewapotranspiracja, opad, bilans_parowania, temperatura, wiatr) %>% as.data.frame()
       return(wynik)
     }
@@ -122,9 +124,11 @@ server <- function(input, output) {
                          opad=sum(prec, na.rm = T),
                          temperatura=mean(t2m, na.rm = T),
                          wiatr=mean(ws, na.rm=T)) %>%
+        
         mutate(bilans_parowania=opad-ewapotranspiracja,
-               rok=paste(min(df$rok),max(df$rok), sep="-")) %>% 
+        rok=paste(min(df$rok),max(df$rok), sep="-")) %>% 
         dplyr::select(rok, ewapotranspiracja, opad, bilans_parowania, temperatura, wiatr) %>% as.data.frame()
+      
       return(wynik)
     }
   )
