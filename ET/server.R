@@ -39,6 +39,7 @@ server <- function(input, output) {
     dane$alt <- alt
     dane$lon <- lon1
     dane$lat <- lat1
+    dane$dni <- as.Date(dane$date, format="%y-%m-%d")
     dane$date2 <- as.Date(dane$date, format="%y-%m-%d")
     dane$miesiac <- format(dane$date2, format="%Y-%m")
     dane$rok <- format(dane$date2, format="%Y")
@@ -100,6 +101,12 @@ server <- function(input, output) {
       return(NULL)
     }else{
       df <- getData()
+      
+      dni_z_opadem <- df %>% dplyr::group_by(dni) %>% dplyr::summarise(jestopad=sum(prec, na.rm=T)) 
+      dni_z_opadem$binarnie <-ifelse(dni_z_opadem$jestopad>0,1,0) 
+      dni_z_opadem$miesiac <-format(dni_z_opadem$dni,"%Y-%m")
+      dni_z_opadem2 <- dni_z_opadem %>%  dplyr::group_by(miesiac) %>% dplyr::summarise(liczba_dni_z_opadem=sum(binarnie, na.rm=T)) 
+      
       wynik <- df %>% dplyr::group_by(miesiac) %>% 
         dplyr::summarise(ewapotranspiracja=sum(ET0_na_godz, na.rm=T), 
                          opad=sum(prec, na.rm = T),
@@ -108,6 +115,10 @@ server <- function(input, output) {
         mutate(bilans_parowania=opad-ewapotranspiracja,
                liczba_dni_z_opadem=sum(ifelse(opad>0,1,0))) %>% 
         dplyr::select(miesiac, ewapotranspiracja, opad, bilans_parowania, temperatura, wiatr) %>% as.data.frame()
+      
+      wynik <- dplyr::left_join(wynik, dni_z_opadem2)
+      
+      
       return(wynik)
     }
   )
