@@ -17,7 +17,7 @@ server <- function(input, output) {
     
 
 
-    dane <- read.table(inFile$datapath, skip = 2, na.strings = c("---", "------"))
+    dane <- read.table(inFile$datapath, skip = 2, na.strings = c("---", "------"), sep="\t")
     colnames(dane) <- c("date","time","t2m","t2max","t2min","rh","dpt","ws","wd","pulsacja","gust","windchill","HI","WindChill","THW","THWI","slp","prec","prec_rate", "rad",
                         "solar_energy", "max_rad","UV","UV1","UVmax","hdd","cdd","in_temp","in_hum","in_dew","in_heat","in_EMC","density","et_davis",
                         "wind_sampling","wind_tx","ISS","ARC")
@@ -39,8 +39,8 @@ server <- function(input, output) {
     dane$alt <- alt
     dane$lon <- lon1
     dane$lat <- lat1
-    dane$dni <- as.Date(dane$date, format="%y-%m-%d")
-    dane$date2 <- as.Date(dane$date, format="%y-%m-%d")
+    dane$dni <- as.Date(dane$date, format="%Y-%m-%d")
+    dane$date2 <- as.Date(dane$date, format="%Y-%m-%d")
     dane$miesiac <- format(dane$date2, format="%Y-%m")
     dane$rok <- format(dane$date2, format="%Y")
     
@@ -49,7 +49,7 @@ server <- function(input, output) {
     
     dane$date2 <- as.POSIXct(paste0(dane$date2, dane$time), format="%Y-%m-%d %H:%M")
     
-    doy <- as.numeric(strftime(as.Date(dane$date, format="%y-%m-%d"), format="%j"))
+    doy <- as.numeric(strftime(as.Date(dane$date, format="%Y-%m-%d"), format="%j"))
     
     WeatherStation1  <- data.frame(wind=dane$ws,RH=dane$rh, temp=dane$t2m,
                                    radiation=dane$rad, height=2, lat=lat1, long=lon1, elev=alt)
@@ -63,6 +63,14 @@ server <- function(input, output) {
     # tj. dla minut roznych od 0 wprowadz hourlyET jako NA
     dane$ET0_na_godz[which(minuty!=0)] <- NA
     dane$ET0_wys_na_godz[which(minuty!=0)] <- NA
+    
+    # obliczenie thsw
+    # e = (dane$rh / 100) * 6.105 * exp (17.27 * dane$t2m / (237.7 + dane$t2m))
+    # ATthw = dane$t2m + 0.33 * e - 0.70 * dane$ws - 4.00
+    # dane$thw = round(ATthw, 2)
+    # 
+    # ATthsw = dane$t2m + 0.348 * e - 0.70 * dane$ws + 0.70 * dane$rad / (dane$ws + 10) - 4.25;
+    # dane$thsw = round(ATthsw, 1);
     
     dane$prec <- ifelse(dane$prec==0.0, NA, dane$prec)
     
@@ -137,7 +145,7 @@ server <- function(input, output) {
                          wiatr=mean(ws, na.rm=T)) %>%
         
         mutate(bilans_parowania=opad-ewapotranspiracja,
-        rok=paste(min(df$rok),max(df$rok), sep="-")) %>% 
+        rok=paste(min(df$rok, na.rm=T),max(df$rok, na.rm=T), sep="-")) %>% 
         dplyr::select(rok, ewapotranspiracja, opad, bilans_parowania, temperatura, wiatr) %>% as.data.frame()
       
       return(wynik)
