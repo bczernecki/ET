@@ -18,7 +18,7 @@ server <- function(input, output) {
 
 
     dane <- read.table(inFile$datapath, skip = 2, na.strings = c("---", "------"), sep="\t")
-    colnames(dane) <- c("date","time","t2m","t2max","t2min","rh","dpt","ws","wd","pulsacja","gust","windchill","HI","WindChill","THW","THWI","slp","prec","prec_rate", "rad",
+    colnames(dane) <- c("date","time","t2m","t2max","t2min","rh","dpt","ws","wd","pulsacja","gust","windchill","HI","WindChill","THW","THSW","slp","prec","prec_rate", "rad",
                         "solar_energy", "max_rad","UV","UV1","UVmax","hdd","cdd","in_temp","in_hum","in_dew","in_heat","in_EMC","density","et_davis",
                         "wind_sampling","wind_tx","ISS","ARC")
     dane <- as.data.frame(dane)
