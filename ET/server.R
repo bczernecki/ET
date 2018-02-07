@@ -24,17 +24,21 @@ server <- function(input, output) {
     dane <- as.data.frame(dane)
     head(dane)
     
-    if(input$sep=="Gryzyna") {
-      alt <- 68
-      lon1 <- 15.28
-      lat1 <- 52.19
-    } 
-    
-    if(input$sep=="Rozany_Potok") {
-      alt <- 86
-      lon1 <- 16.94
-      lat1 <- 52.46
-    } 
+    # if(input$sep=="Gryzyna") {
+    #   alt <- 68
+    #   lon1 <- 15.28
+    #   lat1 <- 52.19
+    # } 
+    # 
+    # if(input$sep=="Rozany_Potok") {
+    #   alt <- 86
+    #   lon1 <- 16.94
+    #   lat1 <- 52.46
+    # } 
+    # 
+    alt <- as.numeric(as.character(input$alt))
+    lon1 <- as.numeric(as.character(input$lon))
+    lat1 <- as.numeric(as.character(input$lat))
 
     dane$alt <- alt
     dane$lon <- lon1
@@ -165,10 +169,7 @@ server <- function(input, output) {
   
   
   
-  output$plot2 <- renderText(
-    print(str(getData()))
-    #plot(dane$ET0_wys_na_godz)
-    )
+  output$plot2 <-  renderText({ input$alt })
   
   output$plot3 <- renderPlot(
     if (is.null(input$file1)) {
